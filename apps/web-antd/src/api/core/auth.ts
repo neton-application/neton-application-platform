@@ -1,4 +1,5 @@
 import { baseRequestClient, requestClient } from '#/api/request';
+import { getOrCreateDeviceId, webLoginDevice } from '#/utils/device-id';
 
 export namespace AuthApi {
   /** 登录接口参数（手机号 + 密码） */
@@ -49,12 +50,18 @@ export namespace AuthApi {
 
 /** 登录（手机号 + 密码） */
 export async function loginApi(data: AuthApi.LoginParams) {
-  return requestClient.post<AuthApi.LoginResult>('/auth/login', data);
+  return requestClient.post<AuthApi.LoginResult>('/auth/login', {
+    ...data,
+    device: webLoginDevice(),
+  });
 }
 
 /** 刷新 accessToken */
 export async function refreshTokenApi(refreshToken: string) {
-  return baseRequestClient.post('/auth/refresh-token', { refreshToken });
+  return baseRequestClient.post('/auth/refresh-token', {
+    refreshToken,
+    deviceId: getOrCreateDeviceId(),
+  });
 }
 
 /** 退出登录 */
@@ -92,7 +99,10 @@ export async function sendSmsCode(data: AuthApi.SmsCodeParams) {
 
 /** 短信验证码登录 */
 export async function smsLogin(data: AuthApi.SmsLoginParams) {
-  return requestClient.post<AuthApi.LoginResult>('/auth/sms-login', data);
+  return requestClient.post<AuthApi.LoginResult>('/auth/sms-login', {
+    ...data,
+    device: webLoginDevice(),
+  });
 }
 
 /** 社交授权的跳转 */
@@ -112,5 +122,8 @@ export async function smsResetPassword(data: AuthApi.ResetPasswordParams) {
 
 /** 社交快捷登录 */
 export async function socialLogin(data: AuthApi.SocialLoginParams) {
-  return requestClient.post<AuthApi.LoginResult>('/auth/social-login', data);
+  return requestClient.post<AuthApi.LoginResult>('/auth/social-login', {
+    ...data,
+    device: webLoginDevice(),
+  });
 }
